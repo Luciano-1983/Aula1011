@@ -2,6 +2,7 @@ var express = require("express");
 var bodyParser = require("body-parser");
 //métodos CRUD para manipular clientes
 const clienteDao=require("./database/dao/cliente-dao");
+const ProdutoDao=require("./database/dao/produto-dao");
 
 //middleware - irá fazer um parser do dados do front e formatar em req.body
 var app = express();
@@ -47,5 +48,46 @@ app.get("/clientes/listar/:key", async function (req, res) {
   console.log(dados);
   res.status(200).send(dados);
 });
+
+
+
+app.post("/produto/salvar", async function (req, res) {
+  try {
+    const retorno = await ProdutoDao.gravarDados({
+      codigo: req.body.codigo,
+      descricao: req.body.descricao,
+      unidademedida: req.body.unidademedida,
+      precoun: req.body.precoun,
+      estoque: req.body.estoque,
+    });
+
+    console.log("Ao salvar o registro retornou: " + retorno);
+    if (retorno == true) {
+      res.status(201).send("Ok");
+    } else {
+      throw "NOk";
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(401).send("NOk");
+  }
+});
+
+app.get("/produto/listar", async function (req, res) {
+  const dados = await ProdutoDao.buscaTodosDados();
+  console.log(dados);
+  res.status(200).send(dados);
+});
+
+app.get("/produto/listar/:key", async function (req, res) {
+  const key = req.params.key;
+  const dados = await ProdutoDao.buscaDados(key);
+  console.log(dados);
+  res.status(200).send(dados);
+});
+
+
+
+
 
 module.exports = app;
